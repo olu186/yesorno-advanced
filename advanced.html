@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Decision Maker</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      text-align: center;
+      background-color: #f9f9f9;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .option-input, .mood-input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    .decision-btn, .clear-btn {
+      padding: 12px 24px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+
+    .decision-btn:hover, .clear-btn:hover {
+      background-color: #0056b3;
+    }
+
+    .clear-btn {
+      background-color: #dc3545;
+    }
+
+    .clear-btn:hover {
+      background-color: #c82333;
+    }
+
+    .result {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .nav {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+
+    .home-btn {
+      padding: 10px 15px;
+      font-size: 14px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .home-btn:hover {
+      background-color: #218838;
+    }
+
+    .mood-dropdown {
+      display: block;
+      width: 90%;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    /* Flex container for buttons */
+    .button-container {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px; /* Adds space between buttons */
+      width: 90%;
+      margin-top: 20px;
+      padding: 0 10px;
+    }
+
+    .button-container button {
+      width: 48%; /* Ensures buttons have equal width */
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Button to Return to Main Page -->
+  <div class="nav">
+    <button class="home-btn" onclick="window.location.href='index.html'">Home</button>
+  </div>
+
+  <h1>Advanced Decision Maker</h1>
+  
+  <input type="text" id="option1" class="option-input" placeholder="Enter first option (e.g., Cat, Stay home, Tea)">
+  <input type="text" id="option2" class="option-input" placeholder="Enter second option (e.g., Dog, Go out, Coffee)">
+  
+  <button onclick="askForMood()" class="decision-btn">Decide</button>
+
+  <div class="result" id="result"></div>
+
+  <!-- Mood Dropdown with "Select One" as Default -->
+  <select id="mood-dropdown" class="mood-dropdown" style="display:none;">
+    <option value="" disabled selected>Select one</option>
+    <option value="bored">Bored</option>
+    <option value="happy">Happy</option>
+    <option value="sad">Sad</option>
+    <option value="energetic">Energetic</option>
+    <option value="stressed">Stressed</option>
+    <option value="lonely">Lonely</option>
+    <option value="curious">Curious</option>
+    <option value="lazy">Lazy</option>
+  </select>
+
+  <!-- Button Container for aligning buttons -->
+  <div class="button-container">
+    <button onclick="finalDecision()" class="decision-btn" id="final-btn" style="display:none;">Get Final Answer</button>
+    <button onclick="clearAll()" class="clear-btn">Clear All</button>
+  </div>
+
+  <script>
+    function askForMood() {
+      const opt1 = document.getElementById('option1').value.trim();
+      const opt2 = document.getElementById('option2').value.trim();
+
+      if (!opt1 || !opt2) {
+        alert("Please enter two options!");
+        return;
+      }
+
+      document.getElementById('result').innerHTML = 
+        "To get a more precise result, please select your mood from the dropdown below.";
+      
+      document.getElementById('mood-dropdown').style.display = "block";
+      document.getElementById('final-btn').style.display = "block";
+    }
+
+    function recommendOption(mood, option1, option2) {
+      // Define mood-based recommendations
+      const moodRules = {
+        "bored": option2, // If bored, go for something more engaging (like going out or tea)
+        "happy": option1, // If happy, go for a relaxed choice (like coffee or staying in)
+        "sad": option1,   // If sad, pick something comforting (like coffee or staying in)
+        "energetic": option2, // If energetic, go for something active (like going out)
+        "stressed": option2,  // If stressed, choose something to help relax (e.g., tea or going out)
+        "lonely": option1,    // If lonely, choose something comforting (e.g., coffee or staying in)
+        "curious": option2,   // If curious, try something new or different (e.g., tea or going out)
+        "lazy": option1,      // If lazy, stay in and relax (e.g., coffee or staying home)
+      };
+
+      return moodRules[mood] || "No recommendation available";
+    }
+
+    function finalDecision() {
+      const opt1 = document.getElementById('option1').value.trim();
+      const opt2 = document.getElementById('option2').value.trim();
+      const mood = document.getElementById('mood-dropdown').value;
+
+      let decisionMessage = "";
+
+      if (mood) {
+        const recommendedOption = recommendOption(mood, opt1, opt2);
+        decisionMessage = `Based on your mood ('${mood}'), the recommended option is: <b>${recommendedOption}</b>.`;
+      } else {
+        const choices = [opt1, opt2];
+        const selected = choices[Math.floor(Math.random() * choices.length)];
+        decisionMessage = `Without a mood description, the random choice is: <b>${selected}</b>.`;
+      }
+
+      document.getElementById('result').innerHTML = decisionMessage;
+    }
+
+    // Clear all inputs and reset the page
+    function clearAll() {
+      document.getElementById('option1').value = '';
+      document.getElementById('option2').value = '';
+      document.getElementById('mood-dropdown').value = ''; // Reset to 'Select one'
+      document.getElementById('mood-dropdown').style.display = 'none';
+      document.getElementById('final-btn').style.display = 'none';
+      document.getElementById('result').innerHTML = '';
+    }
+  </script>
+
+</body>
+</html>
