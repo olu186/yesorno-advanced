@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yes/No/Try Again Wheel</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      text-align: center;
+      background-color: #f9f9f9;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    input {
+      width: 80%;
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      display: block;
+      margin: 10px auto;
+    }
+
+    .wheel-container {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      margin: 20px auto;
+    }
+
+    .wheel {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background-color: #f0f0f0;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      position: relative;
+      overflow: hidden;
+      transition: transform 3s cubic-bezier(0.17, 0.67, 0.21, 0.99);
+    }
+
+    /* Create sections using conic-gradient */
+    .wheel-face {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      position: absolute;
+      background: conic-gradient(
+        #4CAF50 0deg 120deg,   /* Green - YES */
+        #F44336 120deg 240deg, /* Red - NO */
+        #2196F3 240deg 360deg  /* Blue - TRY AGAIN */
+      );
+    }
+
+    /* Section dividers */
+    .divider {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      height: 50%;
+      width: 2px;
+      background-color: white;
+      transform-origin: bottom center;
+      z-index: 2;
+    }
+
+    .divider:nth-child(1) { transform: translateX(-50%) rotate(0deg); }
+    .divider:nth-child(2) { transform: translateX(-50%) rotate(120deg); }
+    .divider:nth-child(3) { transform: translateX(-50%) rotate(240deg); }
+
+    /* Text labels */
+    .label {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform-origin: center;
+      color: white;
+      font-weight: bold;
+      font-size: 18px;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+      width: 100px;
+      text-align: center;
+      z-index: 2;
+    }
+
+    /* Position the labels in the center of each section */
+    .yes-label {
+      transform: translate(-50%, -50%) rotate(60deg) translateY(-90px) rotate(-60deg);
+    }
+
+    .no-label {
+      transform: translate(-50%, -50%) rotate(180deg) translateY(-90px) rotate(-180deg);
+    }
+
+    .try-again-label {
+      transform: translate(-50%, -50%) rotate(300deg) translateY(-90px) rotate(-300deg);
+    }
+
+    /* Center circle */
+    .center {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(to bottom right, #ffffff, #e0e0e0);
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+      border: 3px solid #ddd;
+    }
+
+    /* Arrow/pointer */
+    .pointer {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 40px;
+      z-index: 11;
+    }
+
+    .pointer::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-top: 20px solid #444;
+    }
+
+    .spin-btn {
+      padding: 12px 24px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      transition: background-color 0.3s, transform 0.1s;
+    }
+
+    .spin-btn:hover { background-color: #45a049; }
+    .spin-btn:active { transform: scale(0.98); }
+
+    .result {
+      margin-top: 20px;
+      font-size: 22px;
+      font-weight: bold;
+      min-height: 40px;
+      transition: all 0.5s;
+    }
+    .nav {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.advanced-btn {
+  padding: 10px 15px;
+  font-size: 14px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.advanced-btn:hover {
+  background-color: #0056b3;
+}
+
+  </style>
+</head>
+<body>
+  <h1>Ask a Yes/No Question</h1>
+  <input type="text" id="question" placeholder="Type your question here..." />
+
+  <button onclick="spinWheel()" class="spin-btn">Spin the Wheel</button>
+  
+  <div class="wheel-container">
+    <div class="wheel" id="wheel">
+      <div class="wheel-face"></div>
+      <div class="divider"></div>
+      <div class="divider"></div>
+      <div class="divider"></div>
+      <div class="label yes-label">YES</div>
+      <div class="label no-label">NO</div>
+      <div class="label try-again-label">TRY AGAIN</div>
+    </div>
+    <div class="center"></div>
+    <div class="pointer"></div>
+  </div>
+  
+  <div class="result" id="result"></div>
+  <div class="nav">
+    <button class="advanced-btn" onclick="window.location.href='advanced.html'">Advanced</button>
+  </div>
+
+  <script>
+    const wheel = document.getElementById('wheel');
+    const result = document.getElementById('result');
+    const questionInput = document.getElementById('question');
+
+    let spinning = false;
+    let currentRotation = 0;
+
+    const answers = [
+      { text: "YES", color: "#4CAF50", rangeStart: 0, rangeEnd: 120 },
+      { text: "NO", color: "#F44336", rangeStart: 120, rangeEnd: 240 },
+      { text: "TRY AGAIN", color: "#2196F3", rangeStart: 240, rangeEnd: 360 }
+    ];
+
+    function spinWheel() {
+      if (spinning) return;
+      if (questionInput.value.trim() === "") {
+        alert("Please enter a question before spinning the wheel.");
+        return;
+      }
+
+      spinning = true;
+      result.textContent = "";
+
+      const rotations = 2 + Math.random() * 3;
+      const extraDegrees = Math.floor(Math.random() * 360);
+      const totalDegrees = rotations * 360 + extraDegrees;
+
+      currentRotation += totalDegrees;
+      wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+      setTimeout(() => {
+        const finalPosition = currentRotation % 360;
+        const selectedAnswer = answers.find(answer => (360 - finalPosition) % 360 >= answer.rangeStart && (360 - finalPosition) % 360 < answer.rangeEnd);
+
+        result.textContent = `"${questionInput.value}" → ${selectedAnswer.text}`;
+        result.style.color = selectedAnswer.color;
+        spinning = false;
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
+
